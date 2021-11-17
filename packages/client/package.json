@@ -1,0 +1,18 @@
+{
+	"name": "@browser-command/client",
+	"version": "0.1.0",
+	"description": "",
+	"main": "dist/",
+	"scripts": {
+		"preinstall": "vite build",
+		"start": "vite"
+	},
+	"author": "",
+	"license": "MIT",
+	"dependencies": {
+		"@browser-command/core": "^0.1.0"
+	},
+	"devDependencies": {
+		"typescript": "^4.4.4"
+	}
+}

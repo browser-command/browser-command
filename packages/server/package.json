@@ -1,0 +1,27 @@
+{
+	"name": "@browser-command/server",
+	"version": "0.1.0",
+	"description": "",
+	"type": "module",
+	"main": "dist/index.js",
+	"scripts": {
+		"start": "set NODE_ENV=production&& ts-node-dev --respawn --transpile-only src/index.ts",
+		"build": "tsc"
+	},
+	"author": "",
+	"license": "MIT",
+	"devDependencies": {
+		"@types/cors": "^2.8.12",
+		"@types/express": "^4.17.13",
+		"@types/express-ws": "^3.0.1",
+		"@types/node": "^16.11.7",
+		"ts-node-dev": "^1.1.8"
+	},
+	"dependencies": {
+		"@browser-command/core": "^0.1.0",
+		"@browser-command/client": "^0.1.0",
+		"cors": "^2.8.5",
+		"express": "^4.17.1",
+		"express-ws": "^5.0.2"
+	}
+}

@@ -18,8 +18,8 @@
 		"ts-node-dev": "^1.1.8"
 	},
 	"dependencies": {
-		"@browser-command/core": "^0.1.0",
-		"@browser-command/client": "^0.1.0",
+		"@browser-command/core": "*",
+		"@browser-command/client": "*",
 		"cors": "^2.8.5",
 		"express": "^4.17.1",
 		"express-ws": "^5.0.2"

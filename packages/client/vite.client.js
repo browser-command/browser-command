@@ -9,16 +9,20 @@ export default defineConfig({
 		lib: {
 			entry: resolvePath('src/index.ts'),
 			name: '@browser-command/client',
-			fileName: (format) => `browser-command.${format}.js`,
+			fileName: (format) => `browser-command.client.${format}.js`,
 		},
 		rollupOptions: {
 			plugins: [
 				typescript({
 					tsconfig: resolvePath('tsconfig.json'),
+					outDir: resolvePath('lib'),
+					declarationDir: resolvePath('lib'),
 					declaration: true,
-					declarationDir: resolvePath('lib/'),
 				}),
 			],
+			output: {
+				dir: resolvePath('lib'),
+			},
 		},
 	},
 });

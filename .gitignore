@@ -244,3 +244,6 @@ dist
 !.vscode/*.code-snippets
 
 # End of https://www.toptal.com/developers/gitignore/api/node,jetbrains+all,visualstudiocode
+
+lib/
+.rollup.cache/

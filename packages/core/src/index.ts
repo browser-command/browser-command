@@ -1,7 +1,3 @@
-import * as systems from './systems'
-
-export function registerNetworked() {
-
-}
-
-export { systems }
+export * from './entities';
+export * from './systems';
+export * from './world';

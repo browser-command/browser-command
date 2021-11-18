@@ -1,7 +1,11 @@
-import { registerNetworked } from '@browser-command/core';
+import { World } from '@browser-command/core';
 
-function loop() {
-	requestAnimationFrame(loop);
+export class Client {
+	public world: World = new World();
+
+	public constructor() {}
+
+	public update(delta: number): void {
+		this.world.update(delta);
+	}
 }
-
-loop();

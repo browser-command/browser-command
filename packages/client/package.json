@@ -2,15 +2,21 @@
 	"name": "@browser-command/client",
 	"version": "0.1.0",
 	"description": "",
-	"main": "dist/",
+	"main": "./lib/browser-command.client.umd.js",
+	"module": "./lib/browser-command.client.es.js",
+	"exports": {
+		"import": "./lib/browser-command.client.es.js",
+		"require": "./lib/browser-command.client.umd.js"
+	},
 	"scripts": {
-		"preinstall": "vite build",
-		"start": "vite"
+		"preinstall": "npm run build",
+		"build": "vite build --config ./vite.client.js && vite build --config ./vite.config.js",
+		"start": "vite --config ./vite.config.js"
 	},
 	"author": "",
 	"license": "MIT",
 	"dependencies": {
-		"@browser-command/core": "^0.1.0"
+		"@browser-command/core": "*"
 	},
 	"devDependencies": {
 		"typescript": "^4.4.4"

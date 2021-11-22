@@ -1,8 +1,13 @@
+import { BinaryReader, BinaryWriter, Encoding } from 'csharp-binary-stream';
+
 import { Register } from '../collections';
 import { Constructor } from '../types';
-import { BinaryReader } from 'csharp-binary-stream';
 
-enum TYPES {
+import { Serializable } from './Serializable';
+import { SchemaType } from './Schema';
+import util from '../util';
+
+export enum Datatype {
 	FLOAT32 = 'float32',
 
 	INT32 = 'int32',
@@ -13,48 +18,77 @@ enum TYPES {
 	UINT16 = 'uint16',
 	UINT8 = 'uint8',
 
+	STRING = 'string',
 	LIST = 'list',
 	CLASS = 'class',
 }
 
 export class Serializer {
-	public static readonly TYPES = TYPES;
+	public static readonly TYPES = Datatype;
 
 	private classes: Register<Constructor, number> = new Register('classes');
+	private idMap: Map<Constructor, number> = new Map();
 
-	public constructor() {}
-
-	public register(id: number, type: Constructor): void {
-		this.classes.register(id, () => new type());
+	public register<T extends Serializable>(type: Constructor<T>, id?: number): void {
+		this.classes.register(id ?? util.hash(type.name), () => new type());
 	}
 
-	public deserialize(data: Buffer, position: number);
-	public deserialize(data: BinaryReader, position: number);
-	public deserialize(data: Buffer | BinaryReader, position = 0) {
+	public deserialize<T = unknown>(data: Buffer, position: number): T;
+	public deserialize<T = unknown>(data: BinaryReader): T;
+	public deserialize<T = unknown>(data: Buffer | BinaryReader, position = 0): T {
 		const reader = data instanceof Buffer ? new BinaryReader(data) : data;
-		reader.position = position;
 
-		const id = reader.readByte();
+		if (data instanceof Buffer) {
+			reader.position = position;
+		}
+
+		const id = reader.readUnsignedShort();
 
 		if (!this.classes.has(id)) {
 			throw new Error(`Unknown class: ${id}`);
 		}
 
-		const instance: any = this.classes.get(id)?.();
+		const instance = this.classes.get(id)?.() as Record<string, any>;
 
 		if (!instance) {
 			throw new Error(`Unknown class: ${id}`);
 		}
 
 		for (const property of Object.keys(instance.schema).sort()) {
-			this.read(reader, instance.schema[property]);
+			instance[property] = this.read(reader, instance.schema[property]);
 		}
 
-		return { instance };
+		return instance as T;
 	}
 
-	public read(reader: BinaryReader, schema: any) {
-		const { type } = schema;
+	public serialize(instance: Serializable, writer = new BinaryWriter()): number[] {
+		const id = this.idMap.get(instance.constructor as Constructor);
+
+		if (id === undefined) {
+			throw new Error(`Unknown class: ${instance.constructor.name}`);
+		}
+
+		const schema = instance.schema();
+
+		if (!schema) {
+			throw new Error(`Unknown class: ${id}`);
+		}
+
+		if (!id) {
+			throw new Error(`Unknown class: ${id}`);
+		}
+
+		writer.writeUnsignedShort(id);
+
+		for (const property of Object.keys(instance.schema).sort()) {
+			this.write(writer, instance[property], schema[property]);
+		}
+
+		return writer.toArray();
+	}
+
+	public read(reader: BinaryReader, schema: SchemaType | Datatype) {
+		const type = typeof schema === 'string' ? schema : schema.type;
 
 		let data: unknown = null;
 
@@ -78,14 +112,68 @@ export class Serializer {
 			const length = reader.readUnsignedShort();
 
 			for (let i = 0; i < length; i++) {
+				if (typeof schema === 'string') {
+					throw new Error(`Unknown type: ${type}`);
+				}
+
+				if (!schema.listType) {
+					throw new Error(`Unknown type: ${type}`);
+				}
+
 				items.push(this.read(reader, schema.listType));
 			}
 
 			data = items;
 		} else if (type === Serializer.TYPES.CLASS) {
-			data = this.deserialize(reader, reader.position);
+			data = this.deserialize(reader);
+		} else if (type === Serializer.TYPES.STRING) {
+			data = reader.readString(Encoding.Utf8);
+		} else {
+			throw new Error(`Unknown type: ${type}`);
 		}
 
 		return data;
+	}
+
+	public write(writer: BinaryWriter, value: unknown, schema: SchemaType | Datatype) {
+		const type = typeof schema === 'string' ? schema : schema.type;
+
+		if (type === Serializer.TYPES.FLOAT32) {
+			writer.writeFloat(value as number);
+		} else if (type === Serializer.TYPES.INT32) {
+			writer.writeInt(value as number);
+		} else if (type === Serializer.TYPES.INT16) {
+			writer.writeShort(value as number);
+		} else if (type === Serializer.TYPES.INT8) {
+			writer.writeSignedByte(value as number);
+		} else if (type === Serializer.TYPES.UINT32) {
+			writer.writeUnsignedInt(value as number);
+		} else if (type === Serializer.TYPES.UINT16) {
+			writer.writeUnsignedShort(value as number);
+		} else if (type === Serializer.TYPES.UINT8) {
+			writer.writeByte(value as number);
+		} else if (type === Serializer.TYPES.LIST) {
+			const items = value as unknown[];
+
+			writer.writeUnsignedShort(items.length);
+
+			for (const item of items) {
+				if (typeof schema === 'string') {
+					throw new Error(`Unknown type: ${type}`);
+				}
+
+				if (!schema.listType) {
+					throw new Error(`Unknown type: ${type}`);
+				}
+
+				this.write(writer, item, schema.listType);
+			}
+		} else if (type === Serializer.TYPES.CLASS) {
+			writer.writeBytes(this.serialize(value as Serializable));
+		} else if (type === Serializer.TYPES.STRING) {
+			writer.writeString(value as string, Encoding.Utf8);
+		} else {
+			throw new Error(`Unknown type: ${type}`);
+		}
 	}
 }

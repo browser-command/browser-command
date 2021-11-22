@@ -1,25 +1,31 @@
 import { World } from '../World';
+import { Datatype, Serializable } from '../serialize';
 
-export class Entity {
-	public static NULL = Object.create(Entity.prototype);
-
+export class Entity implements Serializable {
 	private readonly _id: string;
 	private readonly _type: string;
-
-	private _parent: Entity;
-	private _owner: Entity;
 
 	private _model: string;
 
 	public constructor(private readonly world: World) {
 		this._id = '';
 		this._type = '';
-		this._parent = Entity.NULL;
-		this._owner = Entity.NULL;
 		this._model = '';
 	}
 
-	public spawn(): void {}
+	public schema() {
+		return {
+			_id: { type: Datatype.STRING },
+			_type: { type: Datatype.STRING },
+			_parent: { type: Datatype.CLASS },
+			_owner: { type: Datatype.CLASS },
+			_model: { type: Datatype.STRING },
+		};
+	}
+
+	public spawn(): void {
+		return;
+	}
 
 	public initialize(): void {
 		return;
@@ -32,7 +38,9 @@ export class Entity {
 	/**
 	 * @note Subclasses which override this method must call super.destroy()
 	 */
-	public destroy(): void {}
+	public destroy(): void {
+		return;
+	}
 
 	public get valid(): boolean {
 		return this._id !== '';
@@ -44,30 +52,6 @@ export class Entity {
 
 	public get type(): string {
 		return this._type;
-	}
-
-	public get parent(): Entity {
-		return this._parent;
-	}
-
-	public set parent(parent: Entity) {
-		if (!parent.valid) {
-			throw new Error(`Invalid parent entity: '${parent.id}'`);
-		}
-
-		this._parent = parent;
-	}
-
-	public get owner(): Entity {
-		return this._owner;
-	}
-
-	public set owner(owner: Entity) {
-		if (!owner.valid) {
-			throw new Error(`Invalid owner entity: '${owner.id}'`);
-		}
-
-		this._owner = owner;
 	}
 
 	public get model(): string {

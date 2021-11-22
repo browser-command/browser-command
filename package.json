@@ -9,7 +9,8 @@
 	},
 	"scripts": {
 		"format": "npx prettier --write .",
-		"lint": "npx eslint packages/*/{src,types}/**"
+		"lint": "npx eslint packages/*/{src,types}/**",
+		"start": "npm run build --workspace=@browser-command/core && npm run build --workspace=@browser-command/client && npm run start --workspace=@browser-command/server"
 	},
 	"devDependencies": {
 		"@typescript-eslint/eslint-plugin": "^5.3.1",

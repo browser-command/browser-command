@@ -8,17 +8,27 @@
 		"import": "./lib/browser-command.client.es.js",
 		"require": "./lib/browser-command.client.umd.js"
 	},
+	"publishConfig": {
+		"registry": "https://registry.npmjs.org",
+		"access": "public"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/browser-command/browser-command"
+	},
 	"scripts": {
-		"preinstall": "npm run build",
 		"build": "vite build --config ./vite.client.js && vite build --config ./vite.config.js",
-		"start": "vite --config ./vite.config.js"
+		"start": "vite --config ./vite.config.js",
+		"prepublish": "npm run build"
 	},
 	"author": "",
 	"license": "MIT",
 	"dependencies": {
-		"@browser-command/core": "*"
+		"@browser-command/core": "*",
+		"three": "^0.134.0"
 	},
 	"devDependencies": {
+		"@types/three": "^0.134.0",
 		"typescript": "^4.4.4"
 	}
 }

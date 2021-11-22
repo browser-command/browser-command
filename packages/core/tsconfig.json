@@ -2,8 +2,14 @@
 	"extends": "../../tsconfig.json",
 		"compilerOptions": {
 			"rootDir": "src",
-			"outDir": "dist"
-		},
+			"outDir": "dist",
+          "lib": [
+            "es2019",
+						"es2021",
+						"dom"
+          ],
+			"experimentalDecorators": true
+        },
 		"include": ["src"],
 		"exclude": ["dist"]
 }

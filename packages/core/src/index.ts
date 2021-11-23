@@ -3,3 +3,4 @@ export * from './systems';
 export * from './World';
 export * from './Engine';
 export * from './network';
+export * from './serialize';

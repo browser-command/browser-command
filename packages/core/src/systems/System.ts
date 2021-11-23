@@ -37,6 +37,5 @@ export abstract class System<T = unknown> {
 	public abstract update(entity: Entity, delta: number): void;
 
 	public destroy(): void {
-		this.world.systems.destroy(this);
 	}
 }

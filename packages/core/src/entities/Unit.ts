@@ -33,11 +33,4 @@ export class Unit extends Entity {
 	set speed(value: number) {
 		this._speed = Math.max(0, value);
 	}
-
-	public pack(packet: Packet): void {
-		super.pack(packet);
-		packet.writeShort(this._health);
-		packet.writeShort(this._armor);
-		packet.writeShort(this._speed);
-	}
 }

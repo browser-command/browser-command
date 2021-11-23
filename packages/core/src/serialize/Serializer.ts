@@ -20,6 +20,7 @@ export enum Datatype {
 
 	STRING = 'string',
 	LIST = 'list',
+	MAP = 'map',
 	CLASS = 'class',
 }
 
@@ -30,10 +31,12 @@ export class Serializer {
 	private idMap: Map<Constructor, number> = new Map();
 
 	public register<T extends Serializable>(type: Constructor<T>, id?: number): void {
-		this.classes.register(id ?? util.hash(type.name), () => new type());
+		const hash = id ?? util.hash(type.name);
+		this.classes.register(hash, () => new type());
+		this.idMap.set(type, hash);
 	}
 
-	public deserialize<T = unknown>(data: Buffer, position: number): T;
+	public deserialize<T = unknown>(data: Buffer, position?: number): T;
 	public deserialize<T = unknown>(data: BinaryReader): T;
 	public deserialize<T = unknown>(data: Buffer | BinaryReader, position = 0): T {
 		const reader = data instanceof Buffer ? new BinaryReader(data) : data;
@@ -54,8 +57,14 @@ export class Serializer {
 			throw new Error(`Unknown class: ${id}`);
 		}
 
-		for (const property of Object.keys(instance.schema).sort()) {
-			instance[property] = this.read(reader, instance.schema[property]);
+		const schema = instance.schema();
+
+		if (!schema) {
+			throw new Error(`Unknown schema: ${id}`);
+		}
+
+		for (const property of Object.keys(schema).sort()) {
+			instance[property] = this.read(reader, schema[property]);
 		}
 
 		return instance as T;
@@ -71,16 +80,12 @@ export class Serializer {
 		const schema = instance.schema();
 
 		if (!schema) {
-			throw new Error(`Unknown class: ${id}`);
-		}
-
-		if (!id) {
-			throw new Error(`Unknown class: ${id}`);
+			throw new Error(`Missing schema for class: ${instance.constructor.name}`);
 		}
 
 		writer.writeUnsignedShort(id);
 
-		for (const property of Object.keys(instance.schema).sort()) {
+		for (const property of Object.keys(schema).sort()) {
 			this.write(writer, instance[property], schema[property]);
 		}
 
@@ -107,20 +112,41 @@ export class Serializer {
 		} else if (type === Serializer.TYPES.UINT8) {
 			data = reader.readByte();
 		} else if (type === Serializer.TYPES.LIST) {
+			if (typeof schema === 'string') {
+				throw new Error(`Unknown type: ${type}`);
+			}
+
+			if (!('listType' in schema && schema.listType)) {
+				throw new Error(`Unknown type: ${type}`);
+			}
+
 			const items = [];
 
 			const length = reader.readUnsignedShort();
 
 			for (let i = 0; i < length; i++) {
-				if (typeof schema === 'string') {
-					throw new Error(`Unknown type: ${type}`);
-				}
-
-				if (!schema.listType) {
-					throw new Error(`Unknown type: ${type}`);
-				}
-
 				items.push(this.read(reader, schema.listType));
+			}
+
+			data = items;
+		} else if (type === Serializer.TYPES.MAP) {
+			if (typeof schema === 'string') {
+				throw new Error(`Unknown type: ${type}`);
+			}
+
+			if (!('mapKeyType' in schema && schema.mapKeyType) || !schema.mapValueType) {
+				throw new Error(`Unknown type: ${type}`);
+			}
+
+			const items = new Map();
+
+			const length = reader.readUnsignedShort();
+
+			for (let i = 0; i < length; i++) {
+				const key = this.read(reader, schema.mapKeyType);
+				const value = this.read(reader, schema.mapValueType);
+
+				items.set(key, value);
 			}
 
 			data = items;
@@ -153,20 +179,37 @@ export class Serializer {
 		} else if (type === Serializer.TYPES.UINT8) {
 			writer.writeByte(value as number);
 		} else if (type === Serializer.TYPES.LIST) {
+			if (typeof schema === 'string') {
+				throw new Error(`Unknown type: ${type}`);
+			}
+
+			if (!('listType' in schema && schema.listType)) {
+				throw new Error(`Unknown type: ${type}`);
+			}
+
 			const items = value as unknown[];
 
 			writer.writeUnsignedShort(items.length);
 
 			for (const item of items) {
-				if (typeof schema === 'string') {
-					throw new Error(`Unknown type: ${type}`);
-				}
-
-				if (!schema.listType) {
-					throw new Error(`Unknown type: ${type}`);
-				}
-
 				this.write(writer, item, schema.listType);
+			}
+		} else if (type === Serializer.TYPES.MAP) {
+			if (typeof schema === 'string') {
+				throw new Error(`Unknown type: ${type}`);
+			}
+
+			if (!('mapKeyType' in schema && schema.mapKeyType) || !schema.mapValueType) {
+				throw new Error(`Unknown type: ${type}`);
+			}
+
+			const items = value as Map<unknown, unknown>;
+
+			writer.writeUnsignedShort(items.size);
+
+			for (const [key, value] of items) {
+				this.write(writer, key, schema.mapKeyType);
+				this.write(writer, value, schema.mapValueType);
 			}
 		} else if (type === Serializer.TYPES.CLASS) {
 			writer.writeBytes(this.serialize(value as Serializable));

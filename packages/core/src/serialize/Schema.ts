@@ -2,13 +2,13 @@ import { Datatype } from './Serializer';
 
 export interface SchemaListType {
 	type: Datatype.LIST;
-	listType: Datatype;
+	listType: SchemaType | Datatype;
 }
 
 export interface SchemaMapType {
 	type: Datatype.MAP;
 	mapKeyType: Datatype;
-	mapValueType: Datatype;
+	mapValueType: SchemaType | Datatype;
 }
 
 export interface SchemaPrimitive {

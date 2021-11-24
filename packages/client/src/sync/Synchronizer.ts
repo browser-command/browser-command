@@ -15,6 +15,5 @@ export class Synchronizer {
 	}
 
 	public update() {
-
 	}
 }

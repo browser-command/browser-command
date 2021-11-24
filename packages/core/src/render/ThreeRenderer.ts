@@ -7,6 +7,7 @@ import {
 	Scene,
 	WebGLRenderer,
 } from 'three';
+
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 

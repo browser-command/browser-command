@@ -8,6 +8,8 @@ import { SchemaType } from './Schema';
 import util from '../util';
 
 export enum Datatype {
+	BOOL = 'bool',
+
 	FLOAT32 = 'float32',
 
 	INT32 = 'int32',
@@ -27,7 +29,7 @@ export enum Datatype {
 export class Serializer {
 	public static readonly TYPES = Datatype;
 
-	private classes: Register<Constructor, number> = new Register('classes');
+	private classes: Register<Constructor<Serializable>, number> = new Register('classes');
 	private idMap: Map<Constructor, number> = new Map();
 
 	public register<T extends Serializable>(type: Constructor<T>, id?: number): void {
@@ -48,14 +50,10 @@ export class Serializer {
 		const id = reader.readUnsignedShort();
 
 		if (!this.classes.has(id)) {
-			throw new Error(`Unknown class: ${id}`);
+			throw new Error(`Unknown class id: ${id}`);
 		}
 
-		const instance = this.classes.get(id)?.() as Record<string, any>;
-
-		if (!instance) {
-			throw new Error(`Unknown class: ${id}`);
-		}
+		const instance = this.classes.create(id);
 
 		const schema = instance.schema();
 
@@ -67,7 +65,7 @@ export class Serializer {
 			instance[property] = this.read(reader, schema[property]);
 		}
 
-		return instance as T;
+		return instance as unknown as T;
 	}
 
 	public serialize(instance: Serializable, writer = new BinaryWriter()): number[] {
@@ -122,7 +120,7 @@ export class Serializer {
 
 			const items = [];
 
-			const length = reader.readUnsignedShort();
+			const length = reader.readUnsignedInt();
 
 			for (let i = 0; i < length; i++) {
 				items.push(this.read(reader, schema.listType));
@@ -140,7 +138,7 @@ export class Serializer {
 
 			const items = new Map();
 
-			const length = reader.readUnsignedShort();
+			const length = reader.readUnsignedInt();
 
 			for (let i = 0; i < length; i++) {
 				const key = this.read(reader, schema.mapKeyType);
@@ -189,7 +187,7 @@ export class Serializer {
 
 			const items = value as unknown[];
 
-			writer.writeUnsignedShort(items.length);
+			writer.writeUnsignedInt(items.length);
 
 			for (const item of items) {
 				this.write(writer, item, schema.listType);
@@ -205,7 +203,7 @@ export class Serializer {
 
 			const items = value as Map<unknown, unknown>;
 
-			writer.writeUnsignedShort(items.size);
+			writer.writeUnsignedInt(items.size);
 
 			for (const [key, value] of items) {
 				this.write(writer, key, schema.mapKeyType);

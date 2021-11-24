@@ -59,7 +59,7 @@ it('should deserialize a class with floats', () => {
 	serializer.register(Test);
 
 	const test = serializer.deserialize<InstanceType<typeof Test>>(
-		Buffer.from([217, 184, 0, 0, 0, 63]),
+		Buffer.from([217, 184, 0, 0, 0, 63])
 	);
 	expect(test).toBeInstanceOf(Test);
 	expect(test.value).toEqual(0.5);
@@ -84,7 +84,7 @@ it('should deserialize a class with integers', () => {
 	serializer.register(Test);
 
 	const test = serializer.deserialize<InstanceType<typeof Test>>(
-		Buffer.from([217, 184, 164, 1, 0, 0]),
+		Buffer.from([217, 184, 164, 1, 0, 0])
 	);
 	expect(test).toBeInstanceOf(Test);
 	expect(test.value).toEqual(420);
@@ -158,7 +158,7 @@ it('should deserialize a class with unsigned integers', () => {
 	serialize.register(Test);
 
 	const test = serialize.deserialize<InstanceType<typeof Test>>(
-		Buffer.from([217, 184, 0, 144, 1, 0]),
+		Buffer.from([217, 184, 0, 144, 1, 0])
 	);
 	expect(test).toBeInstanceOf(Test);
 	expect(test.value).toEqual(102400);
@@ -221,7 +221,7 @@ it('should deserialize a class with a string', () => {
 	serialize.register(Test);
 
 	const test = serialize.deserialize<InstanceType<typeof Test>>(
-		Buffer.from([217, 184, 4, 116, 101, 115, 116]),
+		Buffer.from([217, 184, 4, 116, 101, 115, 116])
 	);
 	expect(test).toBeInstanceOf(Test);
 	expect(test.value).toEqual('test');
@@ -254,7 +254,7 @@ it('should deserialize a class with a class', () => {
 	serialize.register(Value, 0x64);
 
 	const test = serialize.deserialize<InstanceType<typeof Test>>(
-		Buffer.from([217, 184, 100, 0, 164, 1, 0, 0]),
+		Buffer.from([217, 184, 100, 0, 164, 1, 0, 0])
 	);
 	expect(test).toBeInstanceOf(Test);
 	expect(test.value).toBeInstanceOf(Value);
@@ -281,7 +281,7 @@ it('should deserialize a class with a list', () => {
 	serialize.register(Test);
 
 	const test = serialize.deserialize<InstanceType<typeof Test>>(
-		Buffer.from([217, 184, 3, 0, 0, 0, 1, 0, 0, 0, 2, 0, 0, 0, 3, 0, 0, 0]),
+		Buffer.from([217, 184, 3, 0, 0, 0, 1, 0, 0, 0, 2, 0, 0, 0, 3, 0, 0, 0])
 	);
 	expect(test).toBeInstanceOf(Test);
 	expect(test.value).toEqual([1, 2, 3]);
@@ -320,7 +320,7 @@ it('should deserialize a class with a map', () => {
 	serialize.register(Test);
 
 	const test = serialize.deserialize<InstanceType<typeof Test>>(
-		Buffer.from([217, 184, 2, 0, 0, 0, 1, 0, 0, 0, 2, 0, 0, 0, 3, 0, 0, 0, 4, 0, 0, 0]),
+		Buffer.from([217, 184, 2, 0, 0, 0, 1, 0, 0, 0, 2, 0, 0, 0, 3, 0, 0, 0, 4, 0, 0, 0])
 	);
 	expect(test).toBeInstanceOf(Test);
 	expect(test.value).toEqual(

@@ -327,7 +327,7 @@ it('should deserialize a class with a map', () => {
 		new Map([
 			[1, 2],
 			[3, 4],
-		]),
+		])
 	);
 });
 
@@ -368,14 +368,14 @@ it('should deserialize a class with a map with a list', () => {
 		Buffer.from([
 			217, 184, 2, 0, 0, 0, 1, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0, 3, 0, 0, 0, 4, 0, 0, 0, 2, 0, 0, 0,
 			5, 0, 0, 0, 6, 0, 0, 0,
-		]),
+		])
 	);
 	expect(test).toBeInstanceOf(Test);
 	expect(test.value).toEqual(
 		new Map([
 			[1, [2, 3]],
 			[4, [5, 6]],
-		]),
+		])
 	);
 });
 
@@ -424,7 +424,7 @@ it('should deserialize a class with a map with a map', () => {
 		Buffer.from([
 			217, 184, 2, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 2, 0, 0, 0, 3, 0, 0, 0, 4, 0, 0, 0, 1, 0, 0, 0,
 			5, 0, 0, 0, 6, 0, 0, 0,
-		]),
+		])
 	);
 
 	expect(test).toBeInstanceOf(Test);
@@ -432,7 +432,7 @@ it('should deserialize a class with a map with a map', () => {
 		new Map([
 			[1, new Map([[2, 3]])],
 			[4, new Map([[5, 6]])],
-		]),
+		])
 	);
 });
 
@@ -487,7 +487,7 @@ it('should deserialize a class with a map with a map with a list', () => {
 		Buffer.from([
 			217, 184, 2, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 2, 0, 0, 0, 1, 0, 0, 0, 3, 0, 0, 0, 4, 0, 0, 0,
 			1, 0, 0, 0, 5, 0, 0, 0, 1, 0, 0, 0, 6, 0, 0, 0,
-		]),
+		])
 	);
 
 	expect(test).toBeInstanceOf(Test);
@@ -495,7 +495,7 @@ it('should deserialize a class with a map with a map with a list', () => {
 		new Map([
 			[1, new Map([[2, [3]]])],
 			[4, new Map([[5, [6]]])],
-		]),
+		])
 	);
 });
 

@@ -1,11 +1,11 @@
-import { Datatype, Schema, Serializable } from '../serialize';
+import { Datatype, Serializable } from '../serialize';
 
-import type { Event } from './Event';
+import { Event } from './Event';
 
 export class Payload implements Serializable {
 	public events: Event[] = [];
 
-	schema(): Schema {
+	public schema() {
 		return {
 			events: {
 				type: Datatype.LIST,

@@ -25,6 +25,7 @@
 	"license": "MIT",
 	"dependencies": {
 		"@browser-command/core": "*",
+		"socket.io-client": "^4.4.0",
 		"three": "^0.134.0"
 	},
 	"devDependencies": {

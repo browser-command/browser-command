@@ -10,6 +10,7 @@
 	"scripts": {
 		"format": "npx prettier --write .",
 		"lint": "npx eslint packages/*/{src,types}/**",
+		"build": "npm run build --workspace=@browser-command/core",
 		"start": "npm run build --workspace=@browser-command/core && npm run build --workspace=@browser-command/client && npm run start --workspace=@browser-command/server",
 		"test": "jest --ci --verbose --forceExit --detectOpenHandles --coverage"
 	},

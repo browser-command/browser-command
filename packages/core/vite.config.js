@@ -1,8 +1,8 @@
 import path from 'path';
-import { defineConfig } from 'vite'
-import typescript from '@rollup/plugin-typescript'
+import { defineConfig } from 'vite';
+import typescript from '@rollup/plugin-typescript';
 
-const resolvePath = (str) => path.resolve(__dirname, str)
+const resolvePath = (str) => path.resolve(__dirname, str);
 
 export default defineConfig({
 	build: {
@@ -12,13 +12,16 @@ export default defineConfig({
 			fileName: (format) => `browser-command.${format}.js`,
 		},
 		rollupOptions: {
+			output: {
+				sourcemap: true,
+			},
 			plugins: [
 				typescript({
 					tsconfig: resolvePath('tsconfig.json'),
 					declaration: true,
-          declarationDir: resolvePath('dist/'),
+					declarationDir: resolvePath('dist/'),
 				}),
-			]
+			],
 		},
 	},
-})
+});

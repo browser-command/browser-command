@@ -1,5 +1,4 @@
 import { Entity } from './Entity';
-import { Packet } from '../network';
 
 export class Unit extends Entity {
 	private _health = 100;

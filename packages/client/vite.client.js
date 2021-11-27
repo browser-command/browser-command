@@ -8,7 +8,7 @@ export default defineConfig({
 	build: {
 		lib: {
 			entry: resolvePath('src/index.ts'),
-			name: '@browser-command/client',
+			name: '@browser-command/player',
 			fileName: (format) => `browser-command.client.${format}.js`,
 		},
 		rollupOptions: {

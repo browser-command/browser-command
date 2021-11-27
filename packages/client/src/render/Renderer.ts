@@ -1,8 +1,8 @@
-import { Engine } from '../Engine';
-import { Entity } from '../entities';
+import { Engine } from '@browser-command/core';
+import { Entity } from '@browser-command/core';
 
 export abstract class Renderer {
-	private engine: Engine;
+	protected engine: Engine;
 
 	protected constructor(engine: Engine) {
 		this.engine = engine;

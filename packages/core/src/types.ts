@@ -1,5 +1,14 @@
-export interface IComparable<T> {
-	equals(other: T): boolean;
+export type Constructor<T = object> = (new (...args: any[]) => T) & { prototype: T };
+
+export interface Vector3 {
+	x: number;
+	y: number;
+	z: number;
 }
 
-export type Constructor<T = object> = (new (...args: any[]) => T) & { prototype: T };
+export interface Quaternion {
+	x: number;
+	y: number;
+	z: number;
+	w: number;
+}

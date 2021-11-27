@@ -1,40 +1,23 @@
 import express from 'express';
-import expressWs from 'express-ws';
 import cors from 'cors';
 import path from 'path';
-import { Packet, World } from '@browser-command/core';
+
+import socket from 'socket.io';
+import { Server } from './Server';
 
 const client = path.join(require.resolve('@browser-command/client'), '../../dist');
 
-const { app } = expressWs(express());
+console.log(client);
 
+const app = express();
 app.use(cors());
-
 app.use(express.static(client));
 
-function toBinaryString(buf: Buffer): string {
-	const result = [];
-	for (const b of buf) {
-		result.push(b.toString(2).padStart(8, '0'));
-	}
-	return result.join(' ');
-}
-
-app.ws('/', (ws, req) => {
-	console.log('open');
-
-	ws.on('message', (msg) => {
-		if (msg instanceof Buffer) {
-			const packet = new Packet(msg);
-			console.log(packet.readInt());
-			console.log(packet.readBoolean());
-		}
-	});
+const handler = app.listen(process.env.PORT || 3000, () => {
+	console.log(`Listening on ${handler.address()}`);
 });
+const io = new socket.Server(handler);
 
-console.log('listening on port 3000');
-app.listen(process.env.PORT || 3000);
+const host = new Server(io);
 
-export class Server {
-	public world: World = new World();
-}
+host.start();

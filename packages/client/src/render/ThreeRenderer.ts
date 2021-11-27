@@ -3,6 +3,7 @@ import {
 	Color,
 	LoadingManager,
 	Object3D,
+	ObjectLoader,
 	PerspectiveCamera,
 	Scene,
 	WebGLRenderer,
@@ -11,23 +12,23 @@ import {
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 
+import { Entity, Engine } from '@browser-command/core';
+
 import { Renderer } from './Renderer';
-import { Entity } from '../entities';
-import { Engine } from '../Engine';
 
 interface Loader {
 	load: (
 		url: string,
 		onLoad: (object: any) => void,
 		onProgress?: (event: ProgressEvent) => void,
-		onError?: (event: ErrorEvent) => void
+		onError?: (event: Error | ErrorEvent) => void
 	) => void;
 }
 
 export class ThreeRenderer extends Renderer {
 	private scene: Scene = new Scene();
 	private renderer = new WebGLRenderer({ antialias: true });
-	private camera: Camera;
+	private readonly camera: Camera;
 
 	private manager = new LoadingManager();
 	private loaders = new Map<string, Loader>();
@@ -56,6 +57,10 @@ export class ThreeRenderer extends Renderer {
 
 		this.loaders.set('obj', new OBJLoader(this.manager));
 		this.loaders.set('gltf', new GLTFLoader(this.manager));
+		this.loaders.set('json', new ObjectLoader(this.manager));
+
+		this.engine.on('entity:create', (entity: Entity) => this.add(entity));
+		this.engine.on('entity:destroy', (entity: Entity) => this.remove(entity));
 	}
 
 	add(entity: Entity) {
@@ -82,12 +87,16 @@ export class ThreeRenderer extends Renderer {
 		for (const [entity] of this.entities) {
 			if (this.models.get(entity) !== entity.model) {
 				this.models.set(entity, entity.model);
-				this.#loadModel(entity, entity.model);
+				this.loadModel(entity, entity.model);
 			}
 		}
+
+		this.renderer.render(this.scene, this.camera);
+
+		super.update();
 	}
 
-	#loadModel(entity: Entity, model: string) {
+	private loadModel(entity: Entity, model: string) {
 		const loader = this.loaders.get(model.split('.').pop() as string);
 		if (!loader) {
 			throw new Error(`Loader for ${model} not found`);

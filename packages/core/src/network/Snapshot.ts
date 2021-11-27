@@ -6,6 +6,8 @@ export class Snapshot implements Serializable {
 	public step = 0;
 	public entities = new Map<string, Entity>();
 
+	public acknowledged = false;
+
 	schema(): Schema {
 		return {
 			type: {
@@ -15,8 +17,9 @@ export class Snapshot implements Serializable {
 				type: Datatype.UINT32,
 			},
 			entities: {
-				type: Datatype.LIST,
-				listType: Datatype.CLASS,
+				type: Datatype.MAP,
+				mapKeyType: Datatype.STRING,
+				mapValueType: Datatype.CLASS,
 			},
 		};
 	}

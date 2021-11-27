@@ -1,57 +1,69 @@
-import { Payload } from './Payload';
-import { Event } from './Event';
+import { EventEmitter2 } from 'eventemitter2';
 
 import { Register } from '../collections';
-import { Schema, Serializable, Serializer } from '../serialize';
-import util from '../util';
+import { Schema, Serializer } from '../serialize';
 
-export class Network {
-	private serializer = new Serializer();
-	private events = new Register<typeof Event>('events');
+import { Event } from './Event';
+import { Snapshot } from './Snapshot';
+import { Payload } from './Payload';
+
+export class Network extends EventEmitter2 {
+	private events = new Register<string, typeof Event>('events');
 	private buffer: Event[] = [];
 
-	public constructor() {
-		this.serializer.register(Payload);
+	public constructor(private serializer = new Serializer()) {
+		super({
+			wildcard: true,
+			delimiter: ':',
+			maxListeners: 100,
+		});
+
+		this.serializer.register('server:snapshot', Snapshot);
+		this.serializer.register('server:payload', Payload);
+
+		this.onAny((name, payload) => {
+			if (typeof name !== 'string') {
+				throw new Error('Event name must be a string');
+			}
+
+			if (!this.events.has(name)) {
+				throw new Error(`Event ${name} is not registered`);
+			}
+
+			const event = this.events.create(name, payload);
+
+			this.buffer.push(event);
+		});
 	}
 
-	public register(name: string, schema: Schema) {
+	public register<T extends Event<T>>(name: string, schema: Schema) {
 		if (this.events.has(name)) {
 			throw new Error(`Event ${name} already registered`);
 		}
 
-		const event = class extends Event implements Serializable {
-			get name() {
-				return name;
-			}
-
-			schema(): Schema {
+		const event = class Custom extends Event<Custom> {
+			schema() {
 				return schema;
 			}
 		};
 
-		this.serializer.register(event, util.hash(name));
+		this.serializer.register(name, event);
 		this.events.register(name, (payload) => new event(payload));
-	}
-
-	public write(name: string, payload: any) {
-		if (!this.events.has(name)) {
-			throw new Error(`Event ${name} is not registered`);
-		}
-
-		const event = this.events.create(name, payload);
-
-		this.buffer.push(event);
 	}
 
 	public serialize() {
 		if (this.buffer.length === 0) {
-			return [];
+			return new Uint8Array(0);
 		}
 
 		const payload = new Payload();
 		payload.events = this.buffer;
 
 		return this.serializer.serialize(payload);
+	}
+
+	public deserialize(payload: Buffer): Payload {
+		return this.serializer.deserialize(payload);
 	}
 
 	public flush() {

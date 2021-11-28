@@ -1,7 +1,10 @@
 import {
+	AmbientLight,
 	Camera,
 	Color,
+	GridHelper,
 	LoadingManager,
+	Material,
 	Object3D,
 	ObjectLoader,
 	PerspectiveCamera,
@@ -9,12 +12,13 @@ import {
 	WebGLRenderer,
 } from 'three';
 
-import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader';
+import { OBJLoader } from '../loader';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 
 import { Entity, Engine } from '@browser-command/core';
 
 import { Renderer } from './Renderer';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
 interface Loader {
 	load: (
@@ -29,6 +33,7 @@ export class ThreeRenderer extends Renderer {
 	private scene: Scene = new Scene();
 	private renderer = new WebGLRenderer({ antialias: true });
 	private readonly camera: Camera;
+	private readonly controls: OrbitControls;
 
 	private manager = new LoadingManager();
 	private loaders = new Map<string, Loader>();
@@ -40,9 +45,10 @@ export class ThreeRenderer extends Renderer {
 	public constructor(engine: Engine) {
 		super(engine);
 
+		this.renderer.setSize(window.innerWidth, window.innerHeight);
 		this.renderer.setPixelRatio(window.devicePixelRatio);
 
-		const viewport = document.getElementById('#viewport');
+		const viewport = document.getElementById('viewport');
 
 		if (!viewport) {
 			throw new Error('Viewport not found');
@@ -50,10 +56,27 @@ export class ThreeRenderer extends Renderer {
 
 		viewport.append(this.renderer.domElement);
 
-		this.camera = new PerspectiveCamera();
+		this.camera = new PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+		this.camera.position.set(0, 100, 0);
+
+		this.controls = new OrbitControls(this.camera, this.renderer.domElement);
+		this.controls.minDistance = 40;
+		this.controls.maxDistance = 1000;
+		this.controls.target.set(0, 0, 0);
+		this.controls.update();
 
 		this.scene.add(this.camera);
-		this.scene.background = new Color(0xff0000);
+		this.scene.background = new Color(0x595959);
+
+		const light = new AmbientLight(0x404040);
+		this.scene.add(light);
+
+		const grid = new GridHelper(500, 10, 0xffffff, 0xffffff);
+		const material = grid.material as Material;
+		material.opacity = 0.5;
+		material.depthWrite = false;
+		material.transparent = true;
+		this.scene.add(grid);
 
 		this.loaders.set('obj', new OBJLoader(this.manager));
 		this.loaders.set('gltf', new GLTFLoader(this.manager));
@@ -64,6 +87,8 @@ export class ThreeRenderer extends Renderer {
 	}
 
 	add(entity: Entity) {
+		console.log(`Adding entity ${entity.id} to renderer`);
+
 		if (this.entities.has(entity)) {
 			return;
 		}
@@ -84,19 +109,30 @@ export class ThreeRenderer extends Renderer {
 	}
 
 	update() {
-		for (const [entity] of this.entities) {
-			if (this.models.get(entity) !== entity.model) {
-				this.models.set(entity, entity.model);
-				this.loadModel(entity, entity.model);
-			}
-		}
+		this.controls.update();
 
 		this.renderer.render(this.scene, this.camera);
+
+		for (const [entity, object3d] of this.entities) {
+			if (this.models.get(entity) !== entity.model) {
+				this.models.set(entity, entity.model);
+
+				if (entity.model) {
+					this.loadModel(entity, entity.model);
+				}
+			}
+
+			object3d.position.set(entity.position.x, entity.position.y, entity.position.z);
+
+			entity.draw();
+		}
 
 		super.update();
 	}
 
 	private loadModel(entity: Entity, model: string) {
+		console.log(`Loading model ${model}`);
+
 		const loader = this.loaders.get(model.split('.').pop() as string);
 		if (!loader) {
 			throw new Error(`Loader for ${model} not found`);
@@ -108,17 +144,24 @@ export class ThreeRenderer extends Renderer {
 				this.scene.add(this.cache.get(model) as Object3D);
 			}
 		} else {
-			loader.load(model, (object) => {
-				if (this.entities.has(entity)) {
-					this.scene.remove(this.entities.get(entity) as Object3D);
+			loader.load(
+				model,
+				(object) => {
+					if (this.entities.has(entity)) {
+						this.scene.remove(this.entities.get(entity) as Object3D);
+					}
+
+					const object3D = 'scene' in object ? object.scene : object;
+
+					this.scene.add(object3D);
+					this.entities.set(entity, object3D);
+					this.cache.set(model, object3D);
+				},
+				undefined,
+				(error) => {
+					console.error(error);
 				}
-
-				const object3D = 'scene' in object ? object.scene : object;
-
-				this.scene.add(object3D);
-				this.entities.set(entity, object3D);
-				this.cache.set(model, object3D);
-			});
+			);
 		}
 	}
 }

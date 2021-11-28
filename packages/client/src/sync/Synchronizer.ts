@@ -11,6 +11,14 @@ export class Synchronizer {
 	) {
 		this.construct = strategy;
 		this.strategy = new strategy(client);
+
+		this.client.on('snapshot', (snapshot) => {
+			this.strategy.collect(snapshot);
+		});
+	}
+
+	public update() {
+		this.strategy.update();
 	}
 
 	public get drift(): Drift {

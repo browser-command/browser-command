@@ -2,15 +2,17 @@ import socket from 'socket.io-client';
 import { Engine } from '@browser-command/core';
 
 import { Synchronizer, SyncStrategy } from './sync';
+import { ThreeRenderer } from './render';
 
 export class Client extends Engine {
 	public connected = false;
-	public config = { host: 'localhost', port: 3000 };
-	public socket = socket(`ws://${this.config.host}:${this.config.port}`, {
+	public config = { host: 'localhost', port: 3000, standalone: false };
+	protected socket = socket(`ws://${this.config.host}:${this.config.port}`, {
 		autoConnect: false,
 	});
 
-	public synchronizer = new Synchronizer(this, SyncStrategy);
+	protected synchronizer = new Synchronizer(this, SyncStrategy);
+	protected renderer = new ThreeRenderer(this);
 
 	public async connect(): Promise<void> {
 		if (this.connected) {
@@ -30,16 +32,21 @@ export class Client extends Engine {
 				reject(error);
 			});
 
-			this.socket.on('server:snapshot', (buffer) => {
-				console.log(this.serializer.deserialize(buffer));
+			this.socket.on('snapshot', (buffer) => {
+				this.emit('snapshot', this.serializer.deserialize(buffer));
 			});
 
-			this.socket.on('server:payload', (buffer) => {
-				console.log(this.serializer.deserialize(buffer));
+			this.socket.on('payload', (buffer) => {
+				this.emit('payload', this.serializer.deserialize(buffer));
 			});
 
 			this.socket.connect();
 		});
+	}
+
+	public update(): void {
+		this.synchronizer.update();
+		this.renderer.update();
 	}
 
 	public initialize(): void {
@@ -47,9 +54,11 @@ export class Client extends Engine {
 
 		this.connected = false;
 
-		this.connect().then(() => {
-			this.connected = true;
-		});
+		if (!this.config.standalone) {
+			this.connect().then(() => {
+				this.connected = true;
+			});
+		}
 	}
 
 	public disconnect(): void {

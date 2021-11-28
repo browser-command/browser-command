@@ -7,8 +7,6 @@ export class Unit extends Entity {
 
 	private _speed = 10;
 
-	public update(dt: number): void {}
-
 	get health(): number {
 		return this._health;
 	}

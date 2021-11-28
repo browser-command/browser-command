@@ -45,10 +45,6 @@ export class GameLoop extends EventEmitter2 {
 	public start(): void {
 		this.last = time();
 		setTimeout(() => this.tick());
-
-		if (typeof window !== 'undefined') {
-			window.requestAnimationFrame(() => this.check());
-		}
 	}
 
 	public tick(): void {

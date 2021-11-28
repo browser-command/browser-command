@@ -33,7 +33,7 @@ export class Serializer {
 
 	public register<T extends Serializable>(id: string, type: Constructor<T>): void {
 		const hash = this.hash(id);
-		this.classes.register(hash, () => new type());
+		this.classes.register(hash, type);
 		this.idMap.set(type, hash);
 	}
 

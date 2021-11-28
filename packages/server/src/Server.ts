@@ -1,5 +1,5 @@
 import socket from 'socket.io';
-import { Datatype, Engine, Snapshot, Unit } from '@browser-command/core';
+import { Datatype, Engine, Snapshot } from '@browser-command/core';
 
 import { Client } from './network';
 
@@ -25,7 +25,9 @@ export class Server extends Engine {
 	initialize() {
 		super.initialize();
 
-		this.entities.create('unit', this.world);
+		const entity = this.entities.create('unit', this.world);
+		entity.model = '/models/m1-ship1.obj';
+		entity.spawn();
 	}
 
 	private connect(socket: socket.Socket) {
@@ -38,6 +40,8 @@ export class Server extends Engine {
 			this.network.emit('client:disconnect', { id: client.id });
 		});
 
+		// this.network.emit('client:connect', { id: client.id });
+
 		this.emit('player:connect', client);
 	}
 
@@ -47,17 +51,7 @@ export class Server extends Engine {
 	}
 
 	public update() {
-		setTimeout(() => {
-			this.sync(true);
-		}, 1000);
-
-		setTimeout(() => {
-			this.network.emit('test', {
-				foo: 'ligma',
-				bar: 69.42,
-				baz: new Unit(this.world),
-			});
-		});
+		this.sync(true);
 	}
 
 	private sync(full = false): void {
@@ -66,9 +60,7 @@ export class Server extends Engine {
 		const payload = network.serialize();
 
 		for (const client of clients) {
-			console.log(`Sending snapshot to ${client.id}`);
-
-			client.send('server:payload', payload);
+			client.send('payload', payload);
 
 			const snapshots = [...client.snapshots];
 			const recent = snapshots.find((s) => s && s.acknowledged);
@@ -77,7 +69,9 @@ export class Server extends Engine {
 			snapshot.type = full || !recent ? 'full' : 'partial';
 			snapshot.entities = world.entities;
 
-			client.send('server:snapshot', this.serializer.serialize(snapshot));
+			const data = this.serializer.serialize(snapshot);
+
+			client.send('snapshot', data);
 		}
 
 		network.flush();

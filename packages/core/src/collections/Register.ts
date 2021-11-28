@@ -1,37 +1,32 @@
 import { EventEmitter2 } from 'eventemitter2';
 
 export class Register<K, T extends new (...args: any[]) => InstanceType<T>> extends EventEmitter2 {
-	private _classes: Map<K, (...args: ConstructorParameters<T>) => InstanceType<T>> = new Map();
+	private _classes: Map<K, T> = new Map();
 
 	public constructor(public readonly name: string) {
 		super();
 	}
 
-	public register<R extends T>(
-		id: K,
-		factory: (...args: ConstructorParameters<R>) => InstanceType<R>
-	): void {
-		this._classes.set(id, factory);
+	public register<R extends T>(id: K, cls: R): void {
+		this._classes.set(id, cls);
 
-		this.emit(`register`, id, factory);
+		this.emit(`register`, id, cls);
 	}
 
 	public has(id: K): boolean {
 		return this._classes.has(id);
 	}
 
-	public get<R extends T = T>(
-		id: K
-	): ((...args: ConstructorParameters<R>) => InstanceType<R>) | undefined {
-		return this._classes.get(id);
+	public get<R extends T = T>(id: K): R | undefined {
+		return this._classes.get(id) as R | undefined;
 	}
 
 	public create<R extends T = T>(id: K, ...args: ConstructorParameters<R>): InstanceType<R> {
-		const factory = this._classes.get(id);
-		if (!factory) {
+		const cls = this._classes.get(id);
+		if (!cls) {
 			throw new Error(`Object class ${id} not found`);
 		}
-		const object = factory(...args);
+		const object = new cls(...args);
 		Object.assign(object, { _type: id });
 
 		this.emit(`create`, object);

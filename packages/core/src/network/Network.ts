@@ -48,14 +48,10 @@ export class Network extends EventEmitter2 {
 		};
 
 		this.serializer.register(name, event);
-		this.events.register(name, (payload) => new event(payload));
+		this.events.register(name, event);
 	}
 
 	public serialize() {
-		if (this.buffer.length === 0) {
-			return new Uint8Array(0);
-		}
-
 		const payload = new Payload();
 		payload.events = this.buffer;
 

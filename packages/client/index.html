@@ -7,8 +7,9 @@
 	<title>Browser Command</title>
 </head>
 <body>
+	<div id='viewport'></div>
 	<script type="module" src="./src/index.ts" defer></script>
-	<script type="module">
+	<script type="module" defer>
 		import { Client } from './src'
 
 		window.client = new Client()

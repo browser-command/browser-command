@@ -17,8 +17,7 @@ export abstract class Engine extends EventEmitter2 {
 	public readonly isServer: boolean;
 	public world: World;
 
-	public entities: Register<string, typeof Entity>;
-
+	protected entities = new Register<string, typeof Entity>('entity');
 	protected serializer = new Serializer();
 	protected network = new Network(this.serializer);
 
@@ -30,7 +29,6 @@ export abstract class Engine extends EventEmitter2 {
 		});
 
 		this.world = new World();
-		this.entities = new Register<string, typeof Entity>('entity');
 
 		const isServer = typeof window === 'undefined';
 		const globals = isServer ? global : window;
@@ -41,24 +39,23 @@ export abstract class Engine extends EventEmitter2 {
 	}
 
 	public initialize(): void {
-		this.entities.on('create', (entity: Entity) => {
-			Object.assign(entity, {
-				_id: Engine.generateUUID(),
-				world: this.world,
-			});
-			this.world.entities.set(entity.id, entity);
+		this.register('entity', Entity);
+		this.register('unit', Unit);
+	}
+
+	public register(name: string, type: typeof Entity): void {
+		this.entities.register(name, type);
+		this.serializer.register(name, type);
+	}
+
+	public create(name: string): Entity {
+		const entity = this.entities.create(name, this.world);
+		Object.assign(entity, {
+			_id: Engine.generateUUID(),
+			world: this.world,
 		});
-
-		this.entities.register('unit', (world) => new Unit(world));
-
-		this.serializer.register('entity', Entity);
-		this.serializer.register('unit', Unit);
-
-		this.network.register('test', {
-			foo: { type: Datatype.STRING },
-			bar: { type: Datatype.FLOAT32 },
-			baz: { type: Datatype.CLASS },
-		});
+		this.emit('entity:create', entity);
+		return entity;
 	}
 
 	public update() {
@@ -67,15 +64,15 @@ export abstract class Engine extends EventEmitter2 {
 
 	public start(): void {
 		this.initialize();
-		this.emit('engine:initialize');
+		this.emit('initialize');
 
 		const loop = new GameLoop({
-			fps: 1,
-			tps: 1,
+			fps: 60,
+			tps: this.isServer ? 2 : 60,
 			callback: () => {
-				this.emit('engine:update:begin');
+				this.emit('update');
 				this.update();
-				this.emit('engine:update:end');
+				this.emit('update:end');
 			},
 		});
 

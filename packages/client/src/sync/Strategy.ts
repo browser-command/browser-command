@@ -34,6 +34,8 @@ export abstract class Strategy {
 				return;
 			}
 		}
+
+		this.snapshots.push(snapshot);
 	}
 
 	public update() {

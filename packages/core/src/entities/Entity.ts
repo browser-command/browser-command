@@ -3,33 +3,43 @@ import { Datatype, Serializable } from '../serialize';
 import { Quaternion, Vector3 } from '../types';
 
 export class Entity implements Serializable {
-	private readonly _id: string;
-	private readonly _type: string;
+	private _id = '';
+	private _type = '';
 
 	private _position: Vector3 = { x: 0, y: 0, z: 0 };
 	private _rotation: Quaternion = { x: 0, y: 0, z: 0, w: 1 };
 
-	private _model: string;
+	private _model = '';
 
-	public constructor(protected readonly world: World) {
-		this._id = '';
-		this._type = '';
-		this._model = '';
-	}
+	private _initialized = false;
+	private _destroyed = false;
+
+	public constructor(protected readonly world: World) {}
 
 	public schema() {
 		return {
-			_id: { type: Datatype.STRING },
-			_type: { type: Datatype.STRING },
-			_model: { type: Datatype.STRING },
+			id: { type: Datatype.STRING },
+			type: { type: Datatype.STRING },
+			model: { type: Datatype.STRING },
 		};
 	}
 
+	/**
+	 * Initializes the entity and adds it to the world.
+	 */
 	public spawn(): void {
-		return;
+		if (this._initialized) return;
+
+		this.initialize();
+
+		this.world.add(this);
 	}
 
 	public initialize(): void {
+		return;
+	}
+
+	public draw(): void {
 		return;
 	}
 
@@ -41,19 +51,29 @@ export class Entity implements Serializable {
 	 * @note Subclasses which override this method must call super.destroy()
 	 */
 	public destroy(): void {
-		return;
+		this._destroyed = true;
+
+		this.world.remove(this);
 	}
 
 	public get valid(): boolean {
-		return this._id !== '';
+		return this._initialized && !this._destroyed && this._id !== '';
 	}
 
 	public get id(): string {
 		return this._id;
 	}
 
+	private set id(id: string) {
+		this._id = id;
+	}
+
 	public get type(): string {
 		return this._type;
+	}
+
+	private set type(type: string) {
+		this._type = type;
 	}
 
 	public get position(): Vector3 {

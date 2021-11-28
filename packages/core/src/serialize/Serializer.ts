@@ -37,10 +37,10 @@ export class Serializer {
 		this.idMap.set(type, hash);
 	}
 
-	public deserialize<T = unknown>(data: ArrayBuffer, position?: number): T;
+	public deserialize<T = unknown>(data: ArrayBufferLike, position?: number): T;
 	public deserialize<T = unknown>(data: BinaryReader): T;
-	public deserialize<T = unknown>(data: ArrayBuffer | BinaryReader, position = 0): T {
-		const reader = data instanceof ArrayBuffer ? new BinaryReader(data) : data;
+	public deserialize<T = unknown>(data: ArrayBufferLike | BinaryReader, position = 0): T {
+		const reader = data instanceof BinaryReader ? data : new BinaryReader(data);
 
 		if (data instanceof ArrayBuffer) {
 			reader.position = position;
@@ -77,7 +77,7 @@ export class Serializer {
 		const schema = instance.schema();
 
 		if (!schema) {
-			throw new Error(`Missing schema for class: ${instance.constructor.name}`);
+			throw new Error(`Missing schema for class: '${instance.constructor.name.toLowerCase()}'`);
 		}
 
 		writer.writeUnsignedShort(id);

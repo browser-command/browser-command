@@ -20,7 +20,7 @@ export class SyncStrategy extends Strategy {
 			type SchemaKey = keyof typeof schema;
 
 			for (const key of Object.keys(schema) as SchemaKey[]) {
-				existing[key] = entity[key];
+				(existing as Record<SchemaKey, Entity[SchemaKey]>)[key] = entity[key];
 			}
 
 			if (!world.has(id)) {

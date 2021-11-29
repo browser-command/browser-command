@@ -1,5 +1,5 @@
 import socket from 'socket.io';
-import { Datatype, Engine, Snapshot } from '@browser-command/core';
+import { Datatype, Engine, GameLoop, Snapshot, Unit } from '@browser-command/core';
 
 import { Client } from './network';
 
@@ -24,10 +24,6 @@ export class Server extends Engine {
 
 	initialize() {
 		super.initialize();
-
-		const entity = this.entities.create('unit', this.world);
-		entity.model = '/models/m1-ship1.obj';
-		entity.spawn();
 	}
 
 	private connect(socket: socket.Socket) {
@@ -50,9 +46,23 @@ export class Server extends Engine {
 		this.clients.delete(client);
 	}
 
-	public update() {
-		this.sync(true);
+	public start() {
+		super.start();
+
+		const loop = new GameLoop({
+			tps: 20,
+			tick: () => {
+				this.emit('update');
+				this.update();
+				this.emit('update:end');
+				this.sync(true);
+			},
+		});
+
+		loop.start();
 	}
+
+	public update() {}
 
 	private sync(full = false): void {
 		const { world, clients, network } = this;

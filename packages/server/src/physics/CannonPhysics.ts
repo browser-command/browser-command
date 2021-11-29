@@ -14,7 +14,7 @@ export class CannonPhysics extends Physics {
 
 		for (const [entity, body] of this.entities) {
 			if (entity.model) entity.position = body.position;
-			entity.rotation = body.quaternion;
+			entity.quaternion = body.quaternion;
 		}
 	}
 
@@ -27,10 +27,10 @@ export class CannonPhysics extends Physics {
 			mass: 1,
 			position: new CANNON.Vec3(entity.position.x, entity.position.y, entity.position.z),
 			quaternion: new CANNON.Quaternion(
-				entity.rotation.x,
-				entity.rotation.y,
-				entity.rotation.z,
-				entity.rotation.w
+				entity.quaternion.x,
+				entity.quaternion.y,
+				entity.quaternion.z,
+				entity.quaternion.w
 			),
 		});
 

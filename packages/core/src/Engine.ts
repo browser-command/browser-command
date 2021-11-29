@@ -1,8 +1,9 @@
 import { EventEmitter2 } from 'eventemitter2';
+import { Quaternion, Vector3 } from 'three';
 
 import { World } from './world';
 import { Network } from './network';
-import { Datatype, Serializer } from './serialize';
+import { Serializer } from './serialize';
 import { GameLoop } from './GameLoop';
 import { Entity, Unit } from './entities';
 import { Register } from './collections';
@@ -39,6 +40,9 @@ export abstract class Engine extends EventEmitter2 {
 	}
 
 	public initialize(): void {
+		this.serializer.register('vector', Vector3);
+		this.serializer.register('quaternion', Quaternion);
+
 		this.register('entity', Entity);
 		this.register('unit', Unit);
 	}
@@ -65,18 +69,6 @@ export abstract class Engine extends EventEmitter2 {
 	public start(): void {
 		this.initialize();
 		this.emit('initialize');
-
-		const loop = new GameLoop({
-			fps: 60,
-			tps: this.isServer ? 2 : 60,
-			callback: () => {
-				this.emit('update');
-				this.update();
-				this.emit('update:end');
-			},
-		});
-
-		loop.start();
 	}
 
 	private static generateUUID() {

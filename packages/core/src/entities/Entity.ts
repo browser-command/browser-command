@@ -1,13 +1,13 @@
 import { World } from '../world';
 import { Datatype, Serializable } from '../serialize';
-import { Quaternion, Vector3 } from '../types';
+import { Vector3, Quaternion } from '../math';
 
 export class Entity implements Serializable {
 	private _id = '';
 	private _type = '';
 
-	private _position: Vector3 = { x: 0, y: 0, z: 0 };
-	private _rotation: Quaternion = { x: 0, y: 0, z: 0, w: 1 };
+	private _position: Vector3 = new Vector3();
+	private _quaternion: Quaternion = new Quaternion();
 
 	private _model = '';
 
@@ -21,6 +21,8 @@ export class Entity implements Serializable {
 			id: { type: Datatype.STRING },
 			type: { type: Datatype.STRING },
 			model: { type: Datatype.STRING },
+			position: { type: Datatype.CLASS },
+			quaternion: { type: Datatype.CLASS },
 		};
 	}
 
@@ -80,21 +82,21 @@ export class Entity implements Serializable {
 		return this._position;
 	}
 
-	public set position(value: Vector3) {
+	public set position(value: { x: number; y: number; z: number }) {
 		this._position.x = value.x;
 		this._position.y = value.y;
 		this._position.z = value.z;
 	}
 
-	public get rotation(): Quaternion {
-		return this._rotation;
+	public get quaternion(): Quaternion {
+		return this._quaternion;
 	}
 
-	public set rotation(value: Quaternion) {
-		this._rotation.x = value.x;
-		this._rotation.y = value.y;
-		this._rotation.z = value.z;
-		this._rotation.w = value.w;
+	public set quaternion(value: { x: number; y: number; z: number; w: number }) {
+		this._quaternion.x = value.x;
+		this._quaternion.y = value.y;
+		this._quaternion.z = value.z;
+		this._quaternion.w = value.w;
 	}
 
 	public get model(): string {

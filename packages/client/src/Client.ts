@@ -1,5 +1,5 @@
 import socket from 'socket.io-client';
-import { Engine } from '@browser-command/core';
+import { Engine, GameLoop } from '@browser-command/core';
 
 import { Synchronizer, SyncStrategy } from './sync';
 import { ThreeRenderer } from './render';
@@ -42,6 +42,20 @@ export class Client extends Engine {
 
 			this.socket.connect();
 		});
+	}
+
+	public start() {
+		super.start();
+
+		const loop = new GameLoop({
+			frame: () => {
+				this.emit('update');
+				this.update();
+				this.emit('update:end');
+			},
+		});
+
+		loop.start();
 	}
 
 	public update(): void {

@@ -9,9 +9,9 @@ const time =
 		  };
 
 export type GameLoopOptions = {
-	fps: number;
 	tps: number;
-	callback: (delta: number) => void;
+	frame: (delta: number) => void;
+	tick: (delta: number) => void;
 };
 
 export class GameLoop extends EventEmitter2 {
@@ -19,6 +19,8 @@ export class GameLoop extends EventEmitter2 {
 	private last = 0;
 	private stall = 0;
 	private delay = 0;
+
+	private delta = 0;
 
 	public options: GameLoopOptions;
 
@@ -30,21 +32,26 @@ export class GameLoop extends EventEmitter2 {
 		});
 
 		this.options = {
-			fps: 60,
 			tps: 20,
-			callback: () => {
+			frame: () => {
+				return;
+			},
+			tick: () => {
 				return;
 			},
 			...options,
 		};
 
-		this.options.fps = 1000 / Math.max(1, this.options.fps);
 		this.options.tps = 1000 / Math.max(1, this.options.tps);
 	}
 
 	public start(): void {
 		this.last = time();
 		setTimeout(() => this.tick());
+
+		if (typeof window !== 'undefined') {
+			window.requestAnimationFrame(() => this.frame());
+		}
 	}
 
 	public tick(): void {
@@ -68,19 +75,16 @@ export class GameLoop extends EventEmitter2 {
 			this.stall = 0;
 		}
 
-		this.options.callback(delta);
+		this.options.tick(delta);
 	}
 
-	private check(): void {
+	private frame(): void {
 		const now = time();
-		if (now > this.next) {
-			this.stall++;
-			this.tick();
-			this.next = now + this.options.fps;
-		}
+		this.options.frame(this.delta);
+		this.delta = time() - now;
 
 		if (typeof window !== 'undefined') {
-			window.requestAnimationFrame(() => this.check());
+			window.requestAnimationFrame(() => this.frame());
 		}
 	}
 }

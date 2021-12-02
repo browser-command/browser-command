@@ -5,16 +5,17 @@ import { Client } from './network';
 
 export class Server extends Engine {
 	public clients = new Set<Client>();
+	private unit: Unit | undefined;
 
 	public constructor(private connection: socket.Server) {
 		super();
 
 		this.network.register('client:connect', {
-			id: { type: Datatype.STRING },
+			id: { type: 'string' },
 		});
 
 		this.network.register('client:disconnect', {
-			id: { type: Datatype.STRING },
+			id: { type: 'string' },
 		});
 
 		this.connection.on('connection', (socket) => {
@@ -24,6 +25,10 @@ export class Server extends Engine {
 
 	initialize() {
 		super.initialize();
+
+		this.unit = this.entities.create<typeof Unit>('unit', this.world);
+		this.unit.model = '/models/m1-ship1.obj';
+		this.unit.spawn();
 	}
 
 	private connect(socket: socket.Socket) {
@@ -51,9 +56,9 @@ export class Server extends Engine {
 
 		const loop = new GameLoop({
 			tps: 20,
-			tick: () => {
+			tick: (delta) => {
 				this.emit('update');
-				this.update();
+				this.update(delta);
 				this.emit('update:end');
 				this.sync(true);
 			},
@@ -62,7 +67,11 @@ export class Server extends Engine {
 		loop.start();
 	}
 
-	public update() {}
+	public update(delta: number) {
+		if (this.unit) {
+			this.unit.position.y = Math.sin(performance.now() / 1000) * 100;
+		}
+	}
 
 	private sync(full = false): void {
 		const { world, clients, network } = this;

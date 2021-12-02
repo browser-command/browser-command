@@ -18,9 +18,11 @@ export class SyncStrategy extends Strategy {
 			const existing = world.get(id) ?? this.client.create(entity.type);
 
 			type SchemaKey = keyof typeof schema;
+			type EntityKey = keyof typeof entity;
 
 			for (const key of Object.keys(schema) as SchemaKey[]) {
-				(existing as Record<SchemaKey, Entity[SchemaKey]>)[key] = entity[key];
+				(existing as unknown as Record<SchemaKey, Entity[EntityKey]>)[key] =
+					entity[key as EntityKey];
 			}
 
 			if (!world.has(id)) {

@@ -12,8 +12,11 @@
 	<script type="module" defer>
 		import { Client } from './src'
 
-		window.client = new Client()
-		window.client.start()
+		const client = new Client()
+
+		window.client = client
+
+		client.start()
 	</script>
 </body>
 </html>

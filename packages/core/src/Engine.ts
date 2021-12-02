@@ -61,7 +61,7 @@ export abstract class Engine extends EventEmitter2 {
 		return entity;
 	}
 
-	public update() {
+	public update(delta: number) {
 		return;
 	}
 

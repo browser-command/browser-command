@@ -1,4 +1,4 @@
-import { Datatype, Schema, Serializable } from '../serialize';
+import { Schema, Serializable } from '../serialize';
 import { Entity } from '../entities';
 
 export class Snapshot implements Serializable {
@@ -10,16 +10,12 @@ export class Snapshot implements Serializable {
 
 	schema(): Schema {
 		return {
-			type: {
-				type: Datatype.STRING,
-			},
-			step: {
-				type: Datatype.UINT32,
-			},
+			type: 'string',
+			step: 'uint32',
 			entities: {
-				type: Datatype.MAP,
-				mapKeyType: Datatype.STRING,
-				mapValueType: Datatype.CLASS,
+				type: 'map',
+				mapKeyType: 'string',
+				mapValueType: 'class',
 			},
 		};
 	}

@@ -4,7 +4,6 @@ import { Quaternion, Vector3 } from 'three';
 import { World } from './world';
 import { Network } from './network';
 import { Serializer } from './serialize';
-import { GameLoop } from './GameLoop';
 import { Entity, Unit } from './entities';
 import { Register } from './collections';
 

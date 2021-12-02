@@ -6,28 +6,22 @@ import { Constructor } from '../types';
 import { Serializable } from './Serializable';
 import { SchemaType } from './Schema';
 
-export enum Datatype {
-	BOOL = 'bool',
-
-	FLOAT32 = 'float32',
-
-	INT32 = 'int32',
-	INT16 = 'int16',
-	INT8 = 'int8',
-
-	UINT32 = 'uint32',
-	UINT16 = 'uint16',
-	UINT8 = 'uint8',
-
-	STRING = 'string',
-	LIST = 'list',
-	MAP = 'map',
-	CLASS = 'class',
-}
+export type Datatype =
+	| 'bool'
+	| 'int8'
+	| 'uint8'
+	| 'int16'
+	| 'uint16'
+	| 'int32'
+	| 'uint32'
+	| 'float32'
+	| 'string'
+	| 'list'
+	| 'map'
+	| 'set'
+	| 'class';
 
 export class Serializer {
-	public static readonly TYPES = Datatype;
-
 	private classes: Register<number, Constructor<Serializable>> = new Register('classes');
 	private idMap: Map<Constructor, number> = new Map();
 
@@ -94,21 +88,21 @@ export class Serializer {
 
 		let data: unknown = null;
 
-		if (type === Serializer.TYPES.FLOAT32) {
+		if (type === 'float32') {
 			data = reader.readFloat();
-		} else if (type === Serializer.TYPES.INT32) {
+		} else if (type === 'int32') {
 			data = reader.readInt();
-		} else if (type === Serializer.TYPES.INT16) {
+		} else if (type === 'int16') {
 			data = reader.readShort();
-		} else if (type === Serializer.TYPES.INT8) {
+		} else if (type === 'int8') {
 			data = reader.readSignedByte();
-		} else if (type === Serializer.TYPES.UINT32) {
+		} else if (type === 'uint32') {
 			data = reader.readUnsignedInt();
-		} else if (type === Serializer.TYPES.UINT16) {
+		} else if (type === 'uint16') {
 			data = reader.readUnsignedShort();
-		} else if (type === Serializer.TYPES.UINT8) {
+		} else if (type === 'uint8') {
 			data = reader.readByte();
-		} else if (type === Serializer.TYPES.LIST) {
+		} else if (type === 'list') {
 			if (typeof schema === 'string') {
 				throw new Error(`Unknown type: ${type}`);
 			}
@@ -126,7 +120,7 @@ export class Serializer {
 			}
 
 			data = items;
-		} else if (type === Serializer.TYPES.MAP) {
+		} else if (type === 'map') {
 			if (typeof schema === 'string') {
 				throw new Error(`Unknown type: ${type}`);
 			}
@@ -147,9 +141,9 @@ export class Serializer {
 			}
 
 			data = items;
-		} else if (type === Serializer.TYPES.CLASS) {
+		} else if (type === 'class') {
 			data = this.deserialize(reader);
-		} else if (type === Serializer.TYPES.STRING) {
+		} else if (type === 'string') {
 			data = reader.readString(Encoding.Utf8);
 		} else {
 			throw new Error(`Unknown type: ${type}`);
@@ -161,21 +155,21 @@ export class Serializer {
 	public write(writer: BinaryWriter, value: unknown, schema: SchemaType | Datatype) {
 		const type = typeof schema === 'string' ? schema : schema.type;
 
-		if (type === Serializer.TYPES.FLOAT32) {
+		if (type === 'float32') {
 			writer.writeFloat(value as number);
-		} else if (type === Serializer.TYPES.INT32) {
+		} else if (type === 'int32') {
 			writer.writeInt(value as number);
-		} else if (type === Serializer.TYPES.INT16) {
+		} else if (type === 'int16') {
 			writer.writeShort(value as number);
-		} else if (type === Serializer.TYPES.INT8) {
+		} else if (type === 'int8') {
 			writer.writeSignedByte(value as number);
-		} else if (type === Serializer.TYPES.UINT32) {
+		} else if (type === 'uint32') {
 			writer.writeUnsignedInt(value as number);
-		} else if (type === Serializer.TYPES.UINT16) {
+		} else if (type === 'uint16') {
 			writer.writeUnsignedShort(value as number);
-		} else if (type === Serializer.TYPES.UINT8) {
+		} else if (type === 'uint8') {
 			writer.writeByte(value as number);
-		} else if (type === Serializer.TYPES.LIST) {
+		} else if (type === 'list') {
 			if (typeof schema === 'string') {
 				throw new Error(`Unknown type: ${type}`);
 			}
@@ -191,7 +185,7 @@ export class Serializer {
 			for (const item of items) {
 				this.write(writer, item, schema.listType);
 			}
-		} else if (type === Serializer.TYPES.MAP) {
+		} else if (type === 'map') {
 			if (typeof schema === 'string') {
 				throw new Error(`Unknown type: ${type}`);
 			}
@@ -208,9 +202,9 @@ export class Serializer {
 				this.write(writer, key, schema.mapKeyType);
 				this.write(writer, value, schema.mapValueType);
 			}
-		} else if (type === Serializer.TYPES.CLASS) {
+		} else if (type === 'class') {
 			writer.writeBytes([...this.serialize(value as Serializable)]);
-		} else if (type === Serializer.TYPES.STRING) {
+		} else if (type === 'string') {
 			writer.writeString(value as string, Encoding.Utf8);
 		} else {
 			throw new Error(`Unknown type: ${type}`);

@@ -1,11 +1,19 @@
 import { Entity } from './Entity';
+import { Schema } from '../serialize';
 
 export class Unit extends Entity {
 	private _health = 100;
-
 	private _armor = 0;
-
 	private _speed = 10;
+
+	schema(): Schema {
+		return {
+			...super.schema(),
+			health: 'uint16',
+			armor: 'uint16',
+			speed: 'uint16',
+		};
+	}
 
 	get health(): number {
 		return this._health;

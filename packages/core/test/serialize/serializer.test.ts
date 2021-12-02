@@ -42,7 +42,7 @@ it('should throw if serializing a class without a schema', () => {
 it('should serialize a class with floats', () => {
 	const serializer = new Serializer();
 
-	const Test = createSerializable(Datatype.FLOAT32);
+	const Test = createSerializable('float32');
 	serializer.register('test', Test);
 
 	const test = new Test();
@@ -55,7 +55,7 @@ it('should serialize a class with floats', () => {
 it('should deserialize a class with floats', () => {
 	const serializer = new Serializer();
 
-	const Test = createSerializable(Datatype.FLOAT32);
+	const Test = createSerializable('float32');
 	serializer.register('test', Test);
 
 	const test = serializer.deserialize<InstanceType<typeof Test>>(
@@ -67,7 +67,7 @@ it('should deserialize a class with floats', () => {
 
 it('should serialize a class with integers', () => {
 	const serializer = new Serializer();
-	const Test = createSerializable(Datatype.INT32);
+	const Test = createSerializable('int32');
 	serializer.register('test', Test);
 
 	const test = new Test();
@@ -80,7 +80,7 @@ it('should serialize a class with integers', () => {
 
 it('should deserialize a class with integers', () => {
 	const serializer = new Serializer();
-	const Test = createSerializable(Datatype.INT32);
+	const Test = createSerializable('int32');
 	serializer.register('test', Test);
 
 	const test = serializer.deserialize<InstanceType<typeof Test>>(
@@ -93,7 +93,7 @@ it('should deserialize a class with integers', () => {
 it('should serialize a class with shorts', () => {
 	const serialize = new Serializer();
 
-	const Test = createSerializable(Datatype.INT16);
+	const Test = createSerializable('int16');
 	serialize.register('test', Test);
 
 	const test = new Test();
@@ -106,7 +106,7 @@ it('should serialize a class with shorts', () => {
 it('should deserialize a class with shorts', () => {
 	const serialize = new Serializer();
 
-	const Test = createSerializable(Datatype.INT16);
+	const Test = createSerializable('int16');
 	serialize.register('test', Test);
 
 	const test = serialize.deserialize<InstanceType<typeof Test>>(Buffer.from([200, 68, 69, 0]));
@@ -117,7 +117,7 @@ it('should deserialize a class with shorts', () => {
 it('should serialize a class with bytes', () => {
 	const serialize = new Serializer();
 
-	const Test = createSerializable(Datatype.INT8);
+	const Test = createSerializable('int8');
 	serialize.register('test', Test);
 
 	const test = new Test();
@@ -130,7 +130,7 @@ it('should serialize a class with bytes', () => {
 it('should deserialize a class with bytes', () => {
 	const serialize = new Serializer();
 
-	const Test = createSerializable(Datatype.INT8);
+	const Test = createSerializable('int8');
 	serialize.register('test', Test);
 
 	const test = serialize.deserialize<InstanceType<typeof Test>>(Buffer.from([200, 68, 69]));
@@ -141,7 +141,7 @@ it('should deserialize a class with bytes', () => {
 it('should serialize a class with unsigned integers', () => {
 	const serialize = new Serializer();
 
-	const Test = createSerializable(Datatype.UINT32);
+	const Test = createSerializable('uint32');
 	serialize.register('test', Test);
 
 	const test = new Test();
@@ -154,7 +154,7 @@ it('should serialize a class with unsigned integers', () => {
 it('should deserialize a class with unsigned integers', () => {
 	const serialize = new Serializer();
 
-	const Test = createSerializable(Datatype.UINT32);
+	const Test = createSerializable('uint32');
 	serialize.register('test', Test);
 
 	const test = serialize.deserialize<InstanceType<typeof Test>>(
@@ -167,7 +167,7 @@ it('should deserialize a class with unsigned integers', () => {
 it('should serialize a class with unsigned shorts', () => {
 	const serialize = new Serializer();
 
-	const Test = createSerializable(Datatype.UINT16);
+	const Test = createSerializable('uint16');
 	serialize.register('test', Test);
 
 	const test = new Test();
@@ -180,7 +180,7 @@ it('should serialize a class with unsigned shorts', () => {
 it('should deserialize a class with unsigned shorts', () => {
 	const serialize = new Serializer();
 
-	const Test = createSerializable(Datatype.UINT16);
+	const Test = createSerializable('uint16');
 	serialize.register('test', Test);
 
 	const test = serialize.deserialize<InstanceType<typeof Test>>(Buffer.from([200, 68, 25, 0]));
@@ -191,7 +191,7 @@ it('should deserialize a class with unsigned shorts', () => {
 it('should serialize a class with unsigned bytes', () => {
 	const serialize = new Serializer();
 
-	const Test = createSerializable(Datatype.UINT8);
+	const Test = createSerializable('uint8');
 	serialize.register('test', Test);
 
 	const test = new Test();
@@ -204,7 +204,7 @@ it('should serialize a class with unsigned bytes', () => {
 it('should serialize a class with a string', () => {
 	const serialize = new Serializer();
 
-	const Test = createSerializable(Datatype.STRING);
+	const Test = createSerializable('string');
 	serialize.register('test', Test);
 
 	const test = new Test();
@@ -217,7 +217,7 @@ it('should serialize a class with a string', () => {
 it('should deserialize a class with a string', () => {
 	const serialize = new Serializer();
 
-	const Test = createSerializable(Datatype.STRING);
+	const Test = createSerializable('string');
 	serialize.register('test', Test);
 
 	const test = serialize.deserialize<InstanceType<typeof Test>>(
@@ -230,10 +230,10 @@ it('should deserialize a class with a string', () => {
 it('should serialize a class with a class', () => {
 	const serialize = new Serializer();
 
-	const Test = createSerializable(Datatype.CLASS);
+	const Test = createSerializable('class');
 	serialize.register('test', Test);
 
-	const Value = createSerializable(Datatype.INT32);
+	const Value = createSerializable('int32');
 	serialize.register('value', Value);
 
 	const test = new Test();
@@ -247,10 +247,10 @@ it('should serialize a class with a class', () => {
 it('should deserialize a class with a class', () => {
 	const serialize = new Serializer();
 
-	const Test = createSerializable(Datatype.CLASS);
+	const Test = createSerializable('class');
 	serialize.register('test', Test);
 
-	const Value = createSerializable(Datatype.INT32);
+	const Value = createSerializable('int32');
 	serialize.register('value', Value);
 
 	const test = serialize.deserialize<InstanceType<typeof Test>>(
@@ -264,7 +264,7 @@ it('should deserialize a class with a class', () => {
 it('should serialize a class with a list', () => {
 	const serialize = new Serializer();
 
-	const Test = createSerializable({ type: Datatype.LIST, listType: Datatype.INT32 });
+	const Test = createSerializable({ type: 'list', listType: 'int32' });
 	serialize.register('test', Test);
 
 	const test = new Test();
@@ -279,7 +279,7 @@ it('should serialize a class with a list', () => {
 it('should deserialize a class with a list', () => {
 	const serialize = new Serializer();
 
-	const Test = createSerializable({ type: Datatype.LIST, listType: Datatype.INT32 });
+	const Test = createSerializable({ type: 'list', listType: 'int32' });
 	serialize.register('test', Test);
 
 	const test = serialize.deserialize<InstanceType<typeof Test>>(
@@ -293,9 +293,9 @@ it('should serialize a class with a map', () => {
 	const serialize = new Serializer();
 
 	const Test = createSerializable({
-		type: Datatype.MAP,
-		mapKeyType: Datatype.INT32,
-		mapValueType: Datatype.INT32,
+		type: 'map',
+		mapKeyType: 'int32',
+		mapValueType: 'int32',
 	});
 	serialize.register('test', Test);
 
@@ -315,9 +315,9 @@ it('should deserialize a class with a map', () => {
 	const serialize = new Serializer();
 
 	const Test = createSerializable({
-		type: Datatype.MAP,
-		mapKeyType: Datatype.INT32,
-		mapValueType: Datatype.INT32,
+		type: 'map',
+		mapKeyType: 'int32',
+		mapValueType: 'int32',
 	});
 	serialize.register('test', Test);
 
@@ -337,9 +337,9 @@ it('should serialize a class with a map with a list', () => {
 	const serialize = new Serializer();
 
 	const Test = createSerializable({
-		type: Datatype.MAP,
-		mapKeyType: Datatype.INT32,
-		mapValueType: { type: Datatype.LIST, listType: Datatype.INT32 },
+		type: 'map',
+		mapKeyType: 'int32',
+		mapValueType: { type: 'list', listType: 'int32' },
 	});
 	serialize.register('test', Test);
 
@@ -362,9 +362,9 @@ it('should deserialize a class with a map with a list', () => {
 	const serialize = new Serializer();
 
 	const Test = createSerializable({
-		type: Datatype.MAP,
-		mapKeyType: Datatype.INT32,
-		mapValueType: { type: Datatype.LIST, listType: Datatype.INT32 },
+		type: 'map',
+		mapKeyType: 'int32',
+		mapValueType: { type: 'list', listType: 'int32' },
 	});
 	serialize.register('test', Test);
 
@@ -387,12 +387,12 @@ it('should serialize a class with a map with a map', () => {
 	const serialize = new Serializer();
 
 	const Test = createSerializable({
-		type: Datatype.MAP,
-		mapKeyType: Datatype.INT32,
+		type: 'map',
+		mapKeyType: 'int32',
 		mapValueType: {
-			type: Datatype.MAP,
-			mapKeyType: Datatype.INT32,
-			mapValueType: Datatype.INT32,
+			type: 'map',
+			mapKeyType: 'int32',
+			mapValueType: 'int32',
 		},
 	});
 	serialize.register('test', Test);
@@ -416,12 +416,12 @@ it('should deserialize a class with a map with a map', () => {
 	const serialize = new Serializer();
 
 	const Test = createSerializable({
-		type: Datatype.MAP,
-		mapKeyType: Datatype.INT32,
+		type: 'map',
+		mapKeyType: 'int32',
 		mapValueType: {
-			type: Datatype.MAP,
-			mapKeyType: Datatype.INT32,
-			mapValueType: Datatype.INT32,
+			type: 'map',
+			mapKeyType: 'int32',
+			mapValueType: 'int32',
 		},
 	});
 	serialize.register('test', Test);
@@ -446,14 +446,14 @@ it('should serialize a class with a map with a map with a list', () => {
 	const serialize = new Serializer();
 
 	const Test = createSerializable({
-		type: Datatype.MAP,
-		mapKeyType: Datatype.INT32,
+		type: 'map',
+		mapKeyType: 'int32',
 		mapValueType: {
-			type: Datatype.MAP,
-			mapKeyType: Datatype.INT32,
+			type: 'map',
+			mapKeyType: 'int32',
 			mapValueType: {
-				type: Datatype.LIST,
-				listType: Datatype.INT32,
+				type: 'list',
+				listType: 'int32',
 			},
 		},
 	});
@@ -478,14 +478,14 @@ it('should deserialize a class with a map with a map with a list', () => {
 	const serialize = new Serializer();
 
 	const Test = createSerializable({
-		type: Datatype.MAP,
-		mapKeyType: Datatype.INT32,
+		type: 'map',
+		mapKeyType: 'int32',
 		mapValueType: {
-			type: Datatype.MAP,
-			mapKeyType: Datatype.INT32,
+			type: 'map',
+			mapKeyType: 'int32',
 			mapValueType: {
-				type: Datatype.LIST,
-				listType: Datatype.INT32,
+				type: 'list',
+				listType: 'int32',
 			},
 		},
 	});

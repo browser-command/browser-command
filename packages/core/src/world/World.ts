@@ -1,5 +1,5 @@
 import { Entity } from '../entities';
-import { Datatype, Serializable } from '../serialize';
+import { Schema, Serializable } from '../serialize';
 
 export class World implements Serializable {
 	public static readonly version = '0.0.0';
@@ -39,12 +39,12 @@ export class World implements Serializable {
 		this.entities.delete(entity.id);
 	}
 
-	public schema() {
+	public schema(): Schema {
 		return {
 			entities: {
-				type: Datatype.MAP,
-				mapKeyType: Datatype.STRING,
-				mapValueType: Datatype.CLASS,
+				type: 'map',
+				mapKeyType: 'string',
+				mapValueType: 'class',
 			},
 		};
 	}

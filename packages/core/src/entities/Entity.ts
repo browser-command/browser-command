@@ -1,5 +1,5 @@
 import { World } from '../world';
-import { Datatype, Serializable } from '../serialize';
+import { Schema, Serializable } from '../serialize';
 import { Vector3, Quaternion } from '../math';
 
 export class Entity implements Serializable {
@@ -16,13 +16,13 @@ export class Entity implements Serializable {
 
 	public constructor(protected readonly world: World) {}
 
-	public schema() {
+	public schema(): Schema {
 		return {
-			id: { type: Datatype.STRING },
-			type: { type: Datatype.STRING },
-			model: { type: Datatype.STRING },
-			position: { type: Datatype.CLASS },
-			quaternion: { type: Datatype.CLASS },
+			id: 'string',
+			type: 'string',
+			model: 'string',
+			position: 'class',
+			quaternion: 'class',
 		};
 	}
 

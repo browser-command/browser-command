@@ -1,7 +1,6 @@
 import { RingBuffer, Snapshot } from '@browser-command/core';
 import { Socket } from 'socket.io';
 import { EventEmitter2 } from 'eventemitter2';
-import * as Buffer from 'buffer';
 
 export class Client extends EventEmitter2 {
 	public readonly id: string;

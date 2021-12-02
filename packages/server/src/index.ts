@@ -13,8 +13,10 @@ const app = express();
 app.use(cors());
 app.use(express.static(client));
 
-const handler = app.listen(process.env.PORT || 3000, () => {
-	console.log(`Listening on ${handler.address()}`);
+const port = process.env.PORT || 3000;
+
+const handler = app.listen(port, () => {
+	console.log(`Listening on port: ${port}`);
 });
 const io = new socket.Server(handler);
 

@@ -1,9 +1,10 @@
 # Browser Command
+![image](https://user-images.githubusercontent.com/54562440/144364641-56e73f49-9daa-4909-af74-961c8ff2ea20.png)
 
 ## Install
 
 ## Information
-
+Browser Command is a multiplayer real time strategy game where you can manage resources, units, buildings, etc. The game is browser based, obviously based off the name, and has the potential for multiplatform support. We plan on implementing a community hub where you can access matchmaking, Mod/Script support, and leaderboards/stats. This game was inspired by a love of RTS games and creating Mods for games as well.
 
 ## Set up
 
